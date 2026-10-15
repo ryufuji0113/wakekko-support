@@ -1,6 +1,6 @@
 # 本文の事実確認
 
-確認日: 2026年10月15日。HTML本文は依頼文を保持し、確認印の除去と指定された見出し番号の修正のみを行った。不一致の記述も修正していない。
+確認日: 2026年10月15日。初版の確認履歴と、同日の指定文への置き換え後の再確認を記録する。現在のHTMLは今回指定された文をそのまま使用している。初版の表は当時の記述に対する履歴であり、現在の判定は追記表を参照。
 
 - P: `/Users/ryuki/Developer/wakekko-pairing-link/Wakekko/Wakekko/`（`feature/pairing-link`、HEAD `f140f6f`）
 - W: `/Users/ryuki/Developer/wakekko-pairing-link/Wakekko/WidgetShared/`
@@ -8,6 +8,8 @@
 - S: P の `Localizable.xcstrings`。T: X の `Localizable.xcstrings`。文字列の行はキーの開始行を示す。
 - `Wakekko/…` は、特記がなければ pairing-link リポジトリ直下からの相対パス。
 - 同じ確認印が複数の文に付いている場合は同じ行にまとめた。結果欄が「一致」でも、明記した条件や静的調査の限界を含む。コード・文字列の読み取りによる確認であり、実機・iCloud実環境・App Storeでの動作試験は行っていない。
+
+## 初版の確認履歴
 
 | 印 | 本文の主張 | 確かめた結果 | 根拠（ファイル:行、キーと ja の値） |
 |---|---|---|---|
@@ -28,6 +30,80 @@
 | 【確認O】 | 解析・広告・行動追跡の第三者SDKやATT許可要求を組み込まない。 | 一致（静的調査の範囲） | P/PrivacyInfo.xcprivacy:5 は Tracking=false、同:7 は追跡ドメイン空。P の全 Swift と WidgetShared 全 Swift に ATT/IDFA/主要解析SDK 利用なし。Wakekko/Wakekko.xcodeproj/project.pbxproj:227 でアプリの packageProductDependencies が空。ThirdParty/BudouX は日本語改行用で、解析SDKではない。実行時の通信観測は未実施。画面名の主張なし。 |
 | 【確認P】 | いつでも個別削除でき、削除は相手にも同期する。「ふたり」から共有を終えると相手は過去の台帳を見られなくなる。 | 不一致（削除の制限・解除後の閲覧） | P/History/HistoryView.swift:534 は個別削除を保存し、P/Core/CloudKit/SyncReceiveApplier.swift:269 は deletedAt を反映するため削除同期は一致。ただし P/Logic/SharedExpenseMutation.swift:19 と P/Logic/LedgerEntryMutation.swift:42 は締め済み月の削除を拒否。S:2289 `monthlyClosing.close.explanation` → ja「締めた月までの記録は、追加・修正・削除ができなくなります。お金は動かず、立替残高も変わりません。あとから解除できます。」。共有終了は P/Core/CloudKit/CloudKitShareCoordinator.swift:199、同:100 は参加解除後もローカル台帳を読み取り用に保持、同:256 と同:297 で isReadOnlySnapshot=true。P/Settings/SettingsView.swift:865 と同:873 に残った記録の説明・一覧。S:9170 `settings.pair.disconnect` → ja「つながりを解除する」、S:9476 `settings.pair.sharedUnavailable.snapshotDescription` →「この端末に残っている、見るだけの記録です。」。なお S:9034 `settings.pair.confirmDisconnectOwnerMessage` →「解除すると、相手はふたりの記録を見られなくなります。記録はこの端末に残ります。」、S:9051 の参加者向け確認文も閲覧不可と説明しており、アプリ内にも文言と保持実装の食い違いがある。 |
 | 【確認Q】 | 無料は履歴直近90日、古い記録は削除しない。Plusは全履歴・残高推移・過去レポート・全期間書出しが使える買い切り。 | 一致 | X/App/AppConfig.swift:14 は90日。X/Core/PlusVisibility.swift:5 は表示限定の下限（永続化や残高計算に使用しない）、同:11 はPlusなら unlimited。X/Core/PlusFeature.swift:22 の4機能が available。X/Report/ReportView.swift:38 は閲覧制限を適用。X/Export/NormalLedgerExportCard.swift:16 と同:29 はPlusの通常書出しと全期間指定、X/Export/LedgerExportPurpose.swift:50 は権利判定。復旧・解除前の保全用書出しは別経路で無料でも可能（同:16）。X/Core/StoreKitPlusStoreClient.swift:17 は nonConsumable。T:14899 `plusPurchase.once` → ja「一度の購入で、ずっと使えます」、T:38 `plusPurchase.freeWindow` →「無料では、履歴・レポート・残高の推移を直近90日分まで見られます。」、T:14916 `plusPurchase.feature.history` →「全期間の履歴とグラフ」、T:4 `plusPurchase.feature.balanceAllTime` →「全期間の立替残高の推移」、T:21 `plusPurchase.feature.reportsAllTime` →「全期間のレポート」、T:14967 `plusPurchase.feature.export` →「書き出し（CSV・Markdown・JSON）」。返金・権利取消時は X/Core/PlusEntitlementPolicy.swift:36 により対象外。 |
+
+## 2026年10月15日・指定文への置き換え後の再確認（B）
+
+対象コミットは引き続き pairing-link `f140f6f` と plus-entitlement `f712d19`。以下は実装と文字列の静的確認であり、既存のアプリ・worktreeは変更せず、実機試験やiCloudの解除操作は行っていない。今回の指定文には新たな不一致もあるため、指定どおり置き換えたうえで明記する。
+
+| 件 | 置き換え後の主張 | 結果 | 根拠（ファイル:行、キーと ja の値） |
+|---|---|---|---|
+| A1 / F | 「ふたり」に写真共有スイッチがあり、オン中の送信支出に写真が付く。個人写真は送らない。 | 不一致（スイッチの場所）。送信条件は一致。 | P/App/RootTabView.swift:326 は content=.pairTab、同:345 は別の設定シート content=.settingsSheet。P/Settings/SettingsView.swift:340 の pairTab 分岐には写真共有なし。写真共有は同:354 の設定シート→同:367 の receiptImageSharingCard→同:566 のToggle。S:11121 `settings.receiptImageSharing` → ja「レシート画像も相手と共有する」、S:14491 `tab.pair` → ja「ふたり」。P/Core/CloudKit/CloudKitSyncCoordinator.swift:2042 は送信時にオンなら CKAsset 添付。P/Core/CloudKit/RecordMapping.swift:192 は個人支出に写真を含めない。OSバックアップの端末外保存までは確認できない。 |
+| A2 / F | オンなら支出に添えたレシート写真を相手が見られる。 | 一致 | P/Settings/SettingsView.swift:566 と P/Core/CloudKit/CloudKitSyncCoordinator.swift:2042。S:11121 `settings.receiptImageSharing` → ja「レシート画像も相手と共有する」。名称の不一致は解消。 |
+| A3 / H | 相手が参加する前に招待をやり直す／取り消すと、旧リンクを使えなくできる。 | 一致（通信・状態確認・保存成功時） | P/Core/Pairing/PairingLinkService.swift:128 は参加済みなら joined、同:141 はpending参加者を削除し保存、同:160 は取消完了。P/Core/Pairing/CloudKit/PairingLinkCloudKitDatabase.swift:90 はpendingのみ削除。P/Core/Pairing/PairingLinkPresentation.swift:76 は待機中に操作を表示。S:225 `settings.pairingLink.reissue` → ja「招待をやり直す」、S:242 `settings.pairingLink.reissueConfirm` → ja「前の招待リンクは使えなくなります。新しいリンクを作りますか？」、S:259 `settings.pairingLink.cancel` → ja「招待を取り消す」、S:276 `settings.pairingLink.cancelConfirm` → ja「この招待リンクを使えなくしますか？」。 |
+| A4 / I | オフでも相手に届いた写真は相手の端末に残る。 | 一致 | P/Settings/SettingsView.swift:568 は設定値変更のみ、P/Core/CloudKit/RecordMapping.swift:423 は端末の写真参照を保持。S:11155 `settings.receiptSharing.retentionNote` → ja「オフにしても、これまでに相手に届いた写真は相手の端末に残ります。」。 |
+| A5 / P | 締めた月は解除まで削除できず、削除は相手にも同期する。 | 一致（対象月が保護範囲から外れた場合） | P/Logic/SharedExpenseMutation.swift:19 は削除前に締めを検査。P/Logic/MonthlyClosing/MonthlyClosingService.swift:100 は最新の有効な締めを解除し、同:110 で deletedAt を設定。MonthlyClosingPolicy.swift:12 は未削除の最新の締めだけから保護範囲を再計算し、同:37 と同:59 は保護外なら許可。最新月から順に解除する仕様（同:83）。過去に別の有効な締めが残れば、その締めまでの保護は残る。S:2731 `monthlyClosing.reopen.message` → ja「%@の記録を、また追加・修正・削除できます。お金と立替残高は変わりません。」、表示はP/Settings/MonthlyClosingView.swift:56。既存テスト Wakekko/WakekkoTests/MonthlyClosingGuardIntegrationTests.swift:261 に、締め中の削除拒否→解除後に同じ削除成功の検証あり（今回未実行）。削除反映はP/Core/CloudKit/SyncReceiveApplier.swift:269。 |
+| A6 / P | 「ふたり」の「つながりを解除する」で同期が終わり、両端末に見るだけの記録が残る。アプリ削除で端末記録も消せる。 | 不一致（両側が見るだけになるという断定） | 入口はP/App/RootTabView.swift:288 と同:326、P/Settings/SettingsView.swift:351 と同:1081。S:14491 `tab.pair` → ja「ふたり」、S:9170 `settings.pair.disconnect` → ja「つながりを解除する」。持ち主側はP/Core/CloudKit/CloudKitShareCoordinator.swift:219 でCKShareのみ削除、同:391 で同じ台帳のままsoloにする。持ち主の台帳を読み取り専用にする処理はない。参加者側は同:254 で共有から離脱、同:256 はsnapshot扱い、P/Settings/SettingsView.swift:1352 は別のソロ台帳へ移行し旧台帳を保存。相手との同期停止・端末記録の保持は一致するが「それぞれ見るだけ」は不一致。アプリ削除によるOS全体のデータ・バックアップ消去はコードでは確認できない。詳細はC参照。 |
+| A7 | 最終更新日は2026年10月15日のまま。 | 一致（依頼指定） | privacy.html の更新日段落は変更前後とも「最終更新日: 2026年10月15日」が1件。アプリの実装による主張ではない。 |
+| A8 / H | 相手が参加する前なら「招待をやり直す」「招待を取り消す」で無効化できる。 | 一致（通信・保存成功時） | A3と同じ処理・文字列。P/Core/Pairing/PairingLinkPresentation.swift:78 が待機中に reissue/cancel を提供し、同:81 の参加済みでは提供しない。 |
+| A9 / F | 「ふたり」に写真共有スイッチ。オン以前の支出も編集・再保存で写真が届くことがある。初期オフで、オフ後も受信写真は残る。 | 不一致（スイッチの場所）。挙動・名称は一致。 | スイッチはA1のとおり設定シート。P/Core/CloudKit/CloudKitSyncCoordinator.swift:2042 は作成日時にかかわらず送信時のオン判定で写真を付ける。P/Core/AppSettings.swift:118 は未設定をオフ扱い。受信写真保持はA4のとおり。S:11121 `settings.receiptImageSharing` → ja「レシート画像も相手と共有する」、S:11155 `settings.receiptSharing.retentionNote` はA4の保持文。 |
+| A10 / Q | Plusの4つの箇条書きが購入画面と同じ言葉。 | 一致（全4行完全一致） | X/Settings/PlusPurchaseView.swift:44 は PlusFeature.purchaseFeatures を表示。X/Core/PlusFeature.swift:10〜13 にキー、同:22 に4機能の有効化。T:14916 `plusPurchase.feature.history` → ja「全期間の履歴とグラフ」、T:4 `plusPurchase.feature.balanceAllTime` → ja「全期間の立替残高の推移」、T:21 `plusPurchase.feature.reportsAllTime` → ja「全期間のレポート」、T:14967 `plusPurchase.feature.export` → ja「書き出し（CSV・Markdown・JSON）」。 |
+| A11 / P | FAQ追加：「ふたり」から解除し同期停止、両端末に見るだけの記録が残る。 | 不一致（持ち主側まで見るだけ、との断定） | A6と同じ。参加者の旧共有台帳を保持する実装と、持ち主の同じ台帳をsoloとして維持する実装を区別する必要がある。P/Core/CloudKit/CloudKitShareCoordinator.swift:391、P/Logic/PairConnectionLedgerTransition.swift:33。 |
+
+### 初版の不一致 F・H・P が解消したか
+
+- F: 旧名称と「オン以降に記録したものだけ」という問題は解消。ただし今回追加した「ふたりにある」は設定シートの実装と不一致。F全体としては未解消。
+- H: 「いつでも」を参加前に限定したことで解消。実際の無効化は通信・状態確認・保存の成功が前提。
+- P: 締め済み月の削除制限の問題は解消。同期停止と端末記録保持も一致。ただし「それぞれの端末に見るだけ」は持ち主側のsolo台帳に当てはまらず、P全体としては未解消。
+- 前回報告は、参加者のスナップショット保持を両側へ広げて説明していた。持ち主側の継続利用と、参加者が自分から離脱した際の別台帳への切り替えを十分に区別できていなかったため、今回の調査で訂正する。
+
+## 解除の確認文と処理の調査（C・アプリ変更なし）
+
+### 押下から確認画面まで
+
+P/App/RootTabView.swift:288〜293 の「ふたり」タブは、同:326〜329 で SettingsView(content: .pairTab) を開く。P/Settings/SettingsView.swift:351〜352 で解除行を表示し、同:1077〜1081 の押下で pairActionGate.request(action) を呼ぶ。実際の確認画面は同:266〜275 の alert。見出し・本文・破壊的ボタンのキーは同:1276〜1312 で持ち主／参加者のアクションから選択する。
+
+| 要素 | 持ち主側 | 参加者側 | 表示しているファイル:行 |
+|---|---|---|---|
+| 見出し | `settings.pair.confirmDisconnectTitle.format` → ja「%@とのつながりを解除しますか？」（S:9102） | 同じ | P/Settings/SettingsView.swift:1280〜1284。%@ は同:1316〜1320 で相手の表示名を差し込む。alert本体は同:267。 |
+| 本文 | `settings.pair.confirmDisconnectOwnerMessage` → ja「解除すると、相手はふたりの記録を見られなくなります。記録はこの端末に残ります。」（S:9034） | `settings.pair.confirmDisconnectParticipantMessage` → ja「解除すると、ふたりの記録はこの端末で見られなくなります。先に書き出しておくことができます。」（S:9051） | P/Settings/SettingsView.swift:1305〜1308、alert本文の表示は同:275。 |
+| 実行ボタン（destructive） | `settings.pair.disconnect` → ja「つながりを解除する」（S:9170） | 同じ | P/Settings/SettingsView.swift:1295 でキー選択、同:270〜272 で表示・実行。 |
+| キャンセルボタン | `history.cancel` → ja「キャンセル」（S:6076） | 同じ | P/Settings/SettingsView.swift:273。 |
+
+補足: `settings.pair.confirmDisconnectTitle.fallback` → ja「つながりを解除しますか？」（S:9085）は pending=nil の分岐（P/Settings/SettingsView.swift:1287〜1288）。通常の持ち主／参加者の解除では、相手名入りの format キーが使用される。
+
+### 実際の解除処理
+
+以下は通信・CloudKit操作と端末保存が成功した経路。失敗時にはlastErrorへ記録して停止する経路があり、相手のオフライン端末の状態が押下直後に変わる保証はない。
+
+| 操作する側 | 共有ゾーン・CKShare | 端末の記録・同期・画面 | 根拠 |
+|---|---|---|---|
+| 持ち主 | 自分のprivate databaseのzone-wide CKShareを削除する。台帳のspace-ゾーンや支出等のレコードを一括削除する処理はない。参加者の共有アクセスが終わる。 | 相手MemberをdeletedAtで無効化し、持ち主のprivate同期を呼ぶ。同じactiveSpaceIDと台帳を残し、共有フラグを消してsolo状態にする。持ち主の台帳を「見るだけ」に固定する処理はなく、締め等の通常制限を除き本人は継続利用できる。相手の端末を遠隔消去しない。 | P/Settings/SettingsView.swift:1329〜1338、P/Core/CloudKit/CloudKitShareCoordinator.swift:219〜242、同:376〜382、同:391〜396、同:442〜449。solo解決はP/Core/Pairing/PairConnectionState.swift:229〜232。履歴の編集経路はP/History/HistoryView.swift:431以降。 |
+| 参加者 | 自分のMemberをdeletedAtで無効化してshared同期を試みた後、shared databaseのacceptedShareIDをdeleteRecordする離脱処理。持ち主のprivate側の台帳ゾーン・支出等を一括削除する処理はない。 | 共有ゾーンIDと共有同期キャッシュを消し、isReadOnlySnapshot=trueにする。SwiftDataの旧台帳本体は削除せず保持。その後、自分の既存／新規ソロ台帳へactiveSpaceIDを切り替え、shared同期の世代を停止する。通常画面は新しいソロ台帳を表示するため、旧台帳が残っていることと、通常画面ですぐ見られることは別。 | P/Settings/SettingsView.swift:1340〜1352、P/Core/CloudKit/CloudKitShareCoordinator.swift:250〜287、P/Models/SyncMetadata.swift:565〜585、P/Settings/SettingsSyncLifecycle.swift:9〜16、P/Logic/PairConnectionLedgerTransition.swift:33〜79、P/Core/CloudKit/CloudKitSyncHost.swift:337〜345。保持期待は既存テスト Wakekko/WakekkoTests/CloudKitShareCoordinatorTests.swift:264〜295、同:298〜323（今回未実行）。 |
+| 持ち主による解除を受けた参加者 | 共有ゾーンが見えなくなったことを確認すると、共有ゾーンを無効化しshared同期を停止。 | 端末の台帳は消さず保持。「記録を見る」でローカルの一覧を表示する経路がある。サーバーの共有アクセス終了と、受信済み記録の閲覧不能は同じではない。 | P/Core/CloudKit/CloudKitSyncCoordinator.swift:1307〜1315、P/Models/SyncMetadata.swift:599〜607、P/Core/Pairing/PairConnectionState.swift:221〜225 と同:50〜54、P/Settings/SettingsView.swift:1129〜1133、同:861〜901。S:9442 `settings.pair.sharedUnavailable.review` → ja「記録を見る」、S:9476 `settings.pair.sharedUnavailable.snapshotDescription` → ja「この端末に残っている、見るだけの記録です。」。 |
+
+### 確認文と実装の食い違い
+
+1. 持ち主側の「相手はふたりの記録を見られなくなります」は断定が強く、受信済みの端末記録を残して「記録を見る」を提供する実装と不一致。「記録はこの端末に残ります」は持ち主側の保持処理と一致するが、持ち主側が閲覧専用になるとは書かれておらず、実装でも閲覧専用にはならない。
+2. 参加者側の「ふたりの記録はこの端末で見られなくなります」は、自発的離脱後に別のソロ台帳へ切り替わる通常画面の説明としては整合し得る。一方、旧台帳は端末から削除されずsnapshotとして保持されるため、データ消去や将来のあらゆる閲覧経路まで含めた閲覧不能を保証する説明としては不正確。「先に書き出しておくことができます」自体に矛盾はない。
+3. 前回の「両側の確認文が保持実装と食い違う」という一括の断定は、端末内保持・共有アクセス・通常画面の表示を区別していなかった。明確な不一致は持ち主確認文の相手側ローカル閲覧に関する断定。参加者確認文は、通常画面から外れることとデータ保持の説明不足として扱う。今回指定されたサイト本文の「それぞれの端末に見るだけ」は、この区別を解決していない。
+
+## Aの文字列・構造検証
+
+既存HTMLタグ・属性・CSSは保持し、A11のh3・pだけを追加した。置き換え前後の件数を検査し、指定の「後」と文字単位で照合した。
+
+| 件 | 検査結果 |
+|---|---|
+| A1 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A2 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A3 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A4 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A5 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A6 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A7 | PASS: 変更前後とも「最終更新日: 2026年10月15日」が1件 |
+| A8 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A9 | PASS: 前1件→0件、後0件→1件、指定文字列と完全一致 |
+| A10 | PASS: 前の4行ブロック1件→0件、後の4行ブロック0件→1件、指定文字列と完全一致 |
+| A11 | PASS: 追加前0件→追加後1件、最後のFAQの直後にh3・pを完全一致で追加 |
 
 ## HTMLの確認
 
