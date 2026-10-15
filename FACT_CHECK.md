@@ -1,6 +1,6 @@
 # 本文の事実確認
 
-確認日: 2026年10月15日。初版の確認履歴と、同日の指定文への置き換え後の再確認を記録する。現在のHTMLは今回指定された文をそのまま使用している。初版の表は当時の記述に対する履歴であり、現在の判定は追記表を参照。
+確認日: 2026年10月15日。初版の確認履歴と、同日の指定文への置き換え後の再確認を記録する。現在のHTMLは今回指定された文をそのまま使用している。初版の表は当時の記述に対する履歴であり、現在の判定は末尾の「再修正後の確認（今回のA・B）」を参照。
 
 - P: `/Users/ryuki/Developer/wakekko-pairing-link/Wakekko/Wakekko/`（`feature/pairing-link`、HEAD `f140f6f`）
 - W: `/Users/ryuki/Developer/wakekko-pairing-link/Wakekko/WidgetShared/`
@@ -112,3 +112,45 @@ P/App/RootTabView.swift:288〜293 の「ふたり」タブは、同:326〜329 �
 ## 画像
 
 GUI自動操作・シミュレータは使用していない。AppKit/WKWebView の takeSnapshot による390px・1024pxの画像化を試したが、サンドボックス内でWebKitの補助サービスへの接続が失敗し45秒でタイムアウトした。qlmanageも sandbox initialization failed で失敗。画像は撮れなかった。
+
+## 2026年10月15日・再修正後の確認（今回のA・B）
+
+今回のAは4件。上の初版・前回修正の表は履歴として保持し、現在のF・Pの判定はこの節を正とする。確認対象は引き続き feature/pairing-link の HEAD f140f6f。Plus対象の feature/plus-entitlement の HEAD f712d19 も維持されているが、今回Plus本文は変更していない。アプリ・各worktreeは読み取りのみ、GUI操作・実機試験・CloudKit操作は行っていない。
+
+### Aの前後照合
+
+| 件 | 対象 | 前後の完全一致確認 |
+|---|---|---|
+| 今回A1 | privacy.html・レシート写真の保存先 | 指定の前1件→0件、指定の後0件→1件。全文を文字単位で一致確認。 |
+| 今回A2 | privacy.html・つながり解除後の記録 | 指定の前1件→0件、指定の後0件→1件。全文を文字単位で一致確認。 |
+| 今回A3 | support.html・写真共有FAQの冒頭 | 指定の前1件→0件、指定の後0件→1件。後続の再保存・初期オフ・写真保持の文は保持。 |
+| 今回A4 | support.html・解除FAQ | 指定の前1件→0件、指定の後0件→1件。全文を文字単位で一致確認。 |
+
+既存HTMLのタグ順・属性・CSSを変更前と照合し一致。ほかの本文と最終更新日「2026年10月15日」も保持。
+
+### B1・設定への入口
+
+| 項目 | 確かめた結果 | 根拠（ファイル:行、キーとjaの値） |
+|---|---|---|
+| 入口の場所とボタン名 | 「ホーム」画面右上の歯車ボタン。見た目はアイコンだけで、文字の「設定」は表示しない。アクセシビリティ名は「設定」。 | P/Home/HomeView.swift:202 は navigationTitle("tab.home")、同:205 は topBarTrailing、同:206〜210 は gearshape のButtonと accessibilityLabel("tab.settings")。S:14474 `tab.home` → ja「ホーム」、S:14525 `tab.settings` → ja「設定」。 |
+| 押したあとの経路 | 歯車を押すと設定シートを開く。 | P/App/RootTabView.swift:264 は isPresentingSettings=true、同:301 は sheet、同:345〜349 は SettingsView(content: .settingsSheet)。 |
+| 開いた画面の見出し | 「じぶんの設定」。 | P/Settings/SettingsView.swift:304 は navigationTitle(navigationTitleKey)、同:502〜503 で settingsSheet時に `settings.personal.title` を選ぶ。S:8337 `settings.personal.title` → ja「じぶんの設定」。 |
+| 写真共有スイッチ | この設定シートに「レシート画像も相手と共有する」を表示する。 | P/Settings/SettingsView.swift:354〜367 の settingsSheet → personalSettingsContent → receiptImageSharingCard、同:566 の Toggle。S:11121 `settings.receiptImageSharing` → ja「レシート画像も相手と共有する」。 |
+| 「アプリの設定」で通じるか | 実装との整合性はあり、設定画面の呼び方として妥当。これは導線・命名からの判断で、利用者テストによる確認ではない。見た目の入口は文字付きボタンではなく「ホーム」右上の歯車、読み上げ名は「設定」、遷移先は「じぶんの設定」。 | 上記のボタン・遷移先・見出しの実装とja値。本文は指定の「アプリの設定」のままとした。 |
+
+### B2・今回A1〜A4の主張
+
+| 件／主張 | 結果 | 根拠（前回Cと同じコード） |
+|---|---|---|
+| 今回A1・A3：設定に写真共有スイッチがあり、オン中に送る共有支出に写真を添える | 一致 | 設定の場所はB1の経路。P/Core/CloudKit/CloudKitSyncCoordinator.swift:2042 は AppSettings().receiptImageSharingEnabled がオンでローカル写真参照がある場合に CKAsset を添える。送信時に判定し、作成日時で限定しない。P/Core/CloudKit/RecordMapping.swift:192 は個人支出の送信に写真を含めない。 |
+| 今回A2・A4：「ふたり」の「つながりを解除する」で相手との同期を終える | 一致（解除操作・端末保存が成功した経路） | P/App/RootTabView.swift:288〜293 と同:326〜329 が「ふたり」タブ。P/Settings/SettingsView.swift:351〜352、同:1081 に解除入口。S:14491 `tab.pair` → ja「ふたり」、S:9170 `settings.pair.disconnect` → ja「つながりを解除する」。持ち主は P/Core/CloudKit/CloudKitShareCoordinator.swift:219、同:382 でCKShare削除。参加者は同:254 で離脱し、P/Core/CloudKit/CloudKitSyncHost.swift:337〜345 でshared同期を停止する。相手のオフライン端末への反映が押下直後になるとは保証しない。 |
+| 今回A2・A4：招待した側は同じ台帳を一人で使い続けられる | 一致 | P/Core/CloudKit/CloudKitShareCoordinator.swift:376〜382 はzone-wide CKShareのみ削除し台帳レコードを残す。同:226〜232 は相手Memberを無効化してprivate同期、同:391〜396 は同じactiveSpaceIDを維持してsolo状態にする。P/Core/Pairing/PairConnectionState.swift:229〜232 はsoloを解決。P/History/HistoryView.swift:448〜451 に同じ支出の編集経路があり、解除で持ち主台帳を閲覧専用にする処理はない。締め等の通常制限は残る。 |
+| 今回A2・A4：参加した側にも受信済み記録が残る | 一致 | 参加者の自発的離脱は P/Core/CloudKit/CloudKitShareCoordinator.swift:250〜256 で同期情報を消してsnapshot扱いにし、台帳自体は削除しない。P/Logic/PairConnectionLedgerTransition.swift:33〜79 は旧共有台帳を保持して別のソロ台帳へ切替。持ち主から解除された場合も P/Core/CloudKit/CloudKitSyncCoordinator.swift:1307〜1315 は無効化・同期停止のみでローカルsnapshotを保持する。既存テスト Wakekko/WakekkoTests/CloudKitShareCoordinatorTests.swift:288〜295 と同:321〜323 に保持の期待がある（今回未実行）。通常画面で旧台帳をすぐ閲覧できるとは本文で保証しなくなった。 |
+| 今回A2・A4：解除しても相手端末の受信済み記録を消せない | 一致（解除操作について） | P/Core/CloudKit/CloudKitShareCoordinator.swift:199〜242 と同:250〜287 の解除処理は共有アクセスの終了・Member無効化・同期状態更新であり、相手端末のレコード消去を要求する処理はない。CKShare削除は同:376〜382。共有アクセス喪失を受けた側も P/Core/CloudKit/CloudKitSyncCoordinator.swift:1312〜1315 でsnapshotを保持する。解除前の個別削除同期と、解除による遠隔消去は別。 |
+| 今回A2：端末記録を消すにはその端末からアプリを削除する | OS挙動の実機確認はできていない | 解除では端末内記録を消さないことは上記で確認。「その端末から」という案内は遠隔消去ではないことと整合するが、アプリ削除・バックアップ復元を含むOS管理データ全体の挙動は今回の静的コード調査の対象外。 |
+
+### B3・FとPの解消状況
+
+- F：解消。既に修正済みの名称・送信対象時点に加え、残っていたスイッチの場所を「アプリの設定」に修正し、実装の導線と一致した。個人写真のOSバックアップによる端末外保存までは前回同様に確認していない。
+- P：解消。締め済み月の削除制限は前回修正済み。今回「両側とも見るだけ」をやめ、持ち主の継続利用・参加者の受信済み記録保持・解除による遠隔消去不可を区別し、前回Cの実装と一致した。アプリ削除時のOS挙動の実機検証は別の未確認事項として残す。
+- アプリ内の解除確認文に関する前回Cの指摘は、サイト本文の修正とは別であり、アプリは変更していない。
