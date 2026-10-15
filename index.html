@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>わけっこ — 二人の立て替えと精算</title>
+<meta name="description" content="二人の立て替えと精算を、記録して、わけっこする家計簿アプリ。">
+<style>
+  :root{
+    --bg:#F4EEE3;
+    --panel:#FFFFFF;
+    --line:#E6DDCF;
+    --text:#2E2925;
+    --muted:#7A7067;
+    --accent:#C9714E;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+    overflow-wrap:anywhere;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:56px 24px 96px}
+  h1{font-size:30px;line-height:1.5;margin:16px 0 8px;color:var(--accent)}
+  h2{font-size:19px;margin:44px 0 12px;padding-top:22px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:28px 0 6px}
+  p{margin:0 0 14px}
+  .lead{color:var(--muted)}
+  .updated{color:var(--muted);font-size:13px;margin-bottom:40px}
+  ul{margin:0 0 14px;padding-left:1.3em}
+  li{margin-bottom:8px}
+  a{color:var(--accent);text-underline-offset:3px}
+  a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:24px 0 16px}
+  table{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:15px}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600}
+  th:first-child{width:30%}
+  .cards{list-style:none;padding:0;margin-top:32px}
+  .cards a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .cards a:hover{border-color:var(--accent)}
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  nav{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px}
+  nav a{display:inline-block;padding:6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<main>
+  <h1>わけっこ</h1>
+  <p class="lead">二人の立て替えと精算を、記録して、わけっこする家計簿アプリ。</p>
+
+  <ul class="cards">
+    <li><a href="./support.html">サポート（support.html）</a></li>
+    <li><a href="./privacy.html">プライバシーポリシー（privacy.html）</a></li>
+  </ul>
+
+</main>
+<footer>
+  わけっこ — 個人開発 / RYUKI Fujiwara
+  <nav aria-label="サイト内ナビゲーション"><a href="./index.html">トップ</a><a href="./support.html">サポート</a><a href="./privacy.html">プライバシーポリシー</a></nav>
+</footer>
+</div>
+</body>
+</html>
